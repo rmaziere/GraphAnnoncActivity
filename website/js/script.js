@@ -40,7 +40,7 @@ function getCompanies(event){
   // destination et type de la requête AJAX (asynchrone ou non)
   ajax.open("GET", uri_query, true);
 
-  // métadonnées de la requête AJAX
+  // métadonnées de la requête AJA
   ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
   // evenement de changement d'état de la requête
@@ -407,16 +407,17 @@ function graphCompanies(event){
       //var links = {};
       links = ajax.responseText;
 
+      console.log(links);
+
       var nodes = {};
 
       // Compute the distinct nodes from the links.
-      links.forEach(function(link) {
+      for(link in links){
         link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
         link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
-      });
+      }
 
-      var width = 960,
-          height = 500;
+      var width = 960, height = 500;
 
       var force = d3.layout.force()
           .nodes(d3.values(nodes))
@@ -486,3 +487,4 @@ function graphCompanies(event){
   // envoi de la requête
   ajax.send();
 }
+
