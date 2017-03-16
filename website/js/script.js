@@ -377,7 +377,7 @@ function addAdvertisement2Result(advertisements, colWidth){
   }
 }
 
-var links = {};
+var links;
 
 //GraphAd2Companies
 function graphCompanies(event){
@@ -395,7 +395,7 @@ function graphCompanies(event){
   ajax.open("GET", uri_query, true);
 
   // métadonnées de la requête AJAX
-  ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  ajax.setRequestHeader("Content-type", "text/html");
 
   // evenement de changement d'état de la requête
   ajax.addEventListener("readystatechange", function(e) {
@@ -405,17 +405,19 @@ function graphCompanies(event){
       // le texte de la réponse
       //var links = JSON.parse(ajax.responseText);
       //var links = {};
-      links = ajax.responseText;
+      //links = ajax.responseText;
 
-      console.log(links);
+      var links = [{source: "ramon185", target: "HOME SCHOOL TUTORING", type: "licensing"},{source: "ramon185", target: "SURINACH*SURINACH VIVANTE/MARIE-JOSE/", type: "licensing"},{source: "ramon185", target: "BOULET*LUCIANO/", type: "licensing"},{source: "ramon185", target: "LEMAIRE*DOMINIQUE NOELLE/", type: "licensing"},{source: "ramon185", target: "ALLARD*MELANIE/", type: "licensing"},{source: "ramon185", target: "MONSEIGNY*MONSIGNY/BERNARD FRANCOIS/", type: "licensing"},{source: "ramon185", target: "MARTIN*RODRIGUEZ/PILAR/", type: "licensing"},{source: "ramon185", target: "SEVERIN*CLAUDETTE/", type: "licensing"},{source: "ramon185", target: "GORAM*LY/LY MAGUY/", type: "licensing"},{source: "ramon185", target: "MALET*JESSIE MARIE MICHELLA/", type: "licensing"},{source: "ramon185", target: "PIERRE*SIMON/", type: "licensing"},{source: "ramon185", target: "BL-EDUCATION SAS", type: "licensing"},{source: "ramon185", target: "UNIS POUR REUSSIR", type: "licensing"},{source: "ramon185", target: "MEKDAM*HABIB/", type: "licensing"},{source: "ramon185", target: "ASSOCIATION DE PARENTS D'ELEVES ENGAGES AVEC LES ENFANTS", type: "licensing"},{source: "ramon185", target: "ASSOCIATION DES PARENTS D'ELEVES DES INSTITUTIONS SCOLAIRES DE CHNE-OR", type: "licensing"}];
 
       var nodes = {};
 
       // Compute the distinct nodes from the links.
-      for(link in links){
+      links.forEach(function(link) {
         link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
         link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
-      }
+      });
+
+      console.log(nodes);
 
       var width = 960, height = 500;
 
