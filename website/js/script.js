@@ -17,6 +17,7 @@ var mylat, mylon;
 
 var layerMarkers = [];
 
+document.getElementById("graphCompanies").addEventListener("click", graphCompanies);
 document.getElementById("companieSearchShow").addEventListener("click", getCompanies);
 document.getElementById("advertisementSearchShow").addEventListener("click", getAdvertisements);
 document.getElementById("removeMarker").addEventListener("click", removeMarker);
@@ -52,7 +53,7 @@ function getCompanies(event){
 
       console.log("Number of companies : " + result.companies.length);
 
-      addCompany2Result(result.companies);
+      addCompany2Result(result.companies, 12);
 
       if (result.companies.length > 0) {
         var liste = "";
@@ -105,7 +106,7 @@ function getAdvertisements(event){
 
       console.log("Number of advertisements : " + result.advertisements.length);
 
-      addAdvertisement2Result(result.advertisements);
+      addAdvertisement2Result(result.advertisements, 12);
 
       if (result.advertisements.length > 0) {
         var liste = "";
@@ -179,7 +180,7 @@ map.on('click', function(e){
 });
 
 //Tab Companies
-function addCompany2Result(companies){
+function addCompany2Result(companies, colWidth){
   var resultDiv = document.getElementById("result");
 
   var newResultDiv = document.createElement("div");
@@ -194,7 +195,7 @@ function addCompany2Result(companies){
   newResultDiv.appendChild(title);
 
   var col = document.createElement("div");
-  col.className = "col-lg-6";
+  col.className = "col-lg-" + colWidth;
   newResultDiv.appendChild(col);
 
   var panel = document.createElement("div");
@@ -205,7 +206,7 @@ function addCompany2Result(companies){
   panelHeading.className = "panel-heading";
   panel.appendChild(panelHeading);
 
-  panelHeading.innerHTML = "Sociétés";
+  panelHeading.innerHTML = companies.length + " Sociétés";
 
   var panelBody = document.createElement("div");
   panelBody.className = "panel-body";
@@ -221,12 +222,26 @@ function addCompany2Result(companies){
 
   var thead = document.createElement("thead");
   var tr = document.createElement("tr");
+
   var thNom = document.createElement("th");
   thNom.innerHTML = "Nom";
+  tr.appendChild(thNom);
+
+  var thActivity = document.createElement("th");
+  thActivity.innerHTML = "Activité";
+  tr.appendChild(thActivity);
+
+  var thAddress = document.createElement("th");
+  thAddress.innerHTML = "Adresse";
+  tr.appendChild(thAddress);
+
+  var thCity = document.createElement("th");
+  thCity.innerHTML = "Commune";
+  tr.appendChild(thCity);
+
   var thDistance = document.createElement("th");
   thDistance.innerHTML = "Distance";
 
-  tr.appendChild(thNom);
   tr.appendChild(thDistance);
 
 
@@ -240,21 +255,34 @@ function addCompany2Result(companies){
 
   for (var i = 0; i < companies.length; i++) {
     var tr = document.createElement("tr");
-    var tdNom = document.createElement("td");
 
+    var tdNom = document.createElement("td");
     tdNom.innerHTML = companies[i].nomen_long;
+    tr.appendChild(tdNom);
+
+    var tdLibAPE = document.createElement("td");
+    tdLibAPE.innerHTML = companies[i].libapet;
+    tr.appendChild(tdLibAPE);
+
+    var tdAddress = document.createElement("td");
+    tdAddress.innerHTML = companies[i].numero + " " + companies[i].nom_voie;
+    tr.appendChild(tdAddress);
+
+    var tdVille = document.createElement("td");
+    tdVille.innerHTML = companies[i].nom_commune;
+    tr.appendChild(tdVille);
+
     var tdDistance = document.createElement("td");
     tdDistance.innerHTML = companies[i].distance / 1000 + " km";
-    tr.appendChild(tdNom);
+
     tr.appendChild(tdDistance);
 
     tbody.appendChild(tr);
   }
-
 }
 
 //Tab Advertisements
-function addAdvertisement2Result(advertisements){
+function addAdvertisement2Result(advertisements, colWidth){
   var resultDiv = document.getElementById("result");
 
   var newResultDiv = document.createElement("div");
@@ -269,7 +297,7 @@ function addAdvertisement2Result(advertisements){
   newResultDiv.appendChild(title);
 
   var col = document.createElement("div");
-  col.className = "col-lg-6";
+  col.className = "col-lg-" + colWidth;
   newResultDiv.appendChild(col);
 
   var panel = document.createElement("div");
@@ -280,7 +308,7 @@ function addAdvertisement2Result(advertisements){
   panelHeading.className = "panel-heading";
   panel.appendChild(panelHeading);
 
-  panelHeading.innerHTML = (advertisements.length + 1) + " Annonces";
+  panelHeading.innerHTML = (advertisements.length) + " Annonces";
 
   var panelBody = document.createElement("div");
   panelBody.className = "panel-body";
@@ -347,4 +375,114 @@ function addAdvertisement2Result(advertisements){
 
     tbody.appendChild(tr);
   }
+}
+
+var links = {};
+
+//GraphAd2Companies
+function graphCompanies(event){
+  //waitingDialog.show("Recherche en cours... Veuillez patienter.");
+
+  // création de l'objet xhr
+  var ajax = new XMLHttpRequest();
+
+  //var uri_query = "http://" + server_name + directory + "/api.php?format=json&type=companies&distance=" + distance + "&activity=" + activity + "&lat=" + mylat + "&lon=" + mylon;
+  var uri_query = "http://78.218.16.117:8080/api.php?format=json&type=ad2companies&ad_id=1013"
+
+  console.log(uri_query);
+
+  // destination et type de la requête AJAX (asynchrone ou non)
+  ajax.open("GET", uri_query, true);
+
+  // métadonnées de la requête AJAX
+  ajax.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+  // evenement de changement d'état de la requête
+  ajax.addEventListener("readystatechange", function(e) {
+
+    // si l'état est le numéro 4 et que la ressource est trouvée
+    if (ajax.readyState == 4 && ajax.status == 200) {
+      // le texte de la réponse
+      //var links = JSON.parse(ajax.responseText);
+      //var links = {};
+      links = ajax.responseText;
+
+      var nodes = {};
+
+      // Compute the distinct nodes from the links.
+      links.forEach(function(link) {
+        link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+        link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+      });
+
+      var width = 960,
+          height = 500;
+
+      var force = d3.layout.force()
+          .nodes(d3.values(nodes))
+          .links(links)
+          .size([width, height])
+          .linkDistance(60)
+          .charge(-300)
+          .on("tick", tick)
+          .start();
+
+      var svg = d3.select("body").append("svg")
+          .attr("width", width)
+          .attr("height", height);
+
+      // Per-type markers, as they don't inherit styles.
+      svg.append("defs").selectAll("marker")
+          .data(["suit", "licensing", "resolved"])
+        .enter().append("marker")
+          .attr("id", function(d) { return d; })
+          .attr("viewBox", "0 -5 10 10")
+          .attr("refX", 15)
+          .attr("refY", -1.5)
+          .attr("markerWidth", 6)
+          .attr("markerHeight", 6)
+          .attr("orient", "auto")
+        .append("path")
+          .attr("d", "M0,-5L10,0L0,5");
+
+      var path = svg.append("g").selectAll("path")
+          .data(force.links())
+        .enter().append("path")
+          .attr("class", function(d) { return "link " + d.type; })
+          .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
+
+      var circle = svg.append("g").selectAll("circle")
+          .data(force.nodes())
+        .enter().append("circle")
+          .attr("r", 6)
+          .call(force.drag);
+
+      var text = svg.append("g").selectAll("text")
+          .data(force.nodes())
+        .enter().append("text")
+          .attr("x", 8)
+          .attr("y", ".31em")
+          .text(function(d) { return d.name; });
+
+      // Use elliptical arc path segments to doubly-encode directionality.
+      function tick() {
+        path.attr("d", linkArc);
+        circle.attr("transform", transform);
+        text.attr("transform", transform);
+      }
+
+      function linkArc(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+      }
+
+      function transform(d) {
+        return "translate(" + d.x + "," + d.y + ")";
+      }
+    }
+  });
+  // envoi de la requête
+  ajax.send();
 }
