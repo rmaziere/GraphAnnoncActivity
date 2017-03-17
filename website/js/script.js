@@ -17,11 +17,13 @@ var mylat, mylon;
 
 var layerMarkers = [];
 
-document.getElementById("graphCompanies").addEventListener("click", graphCompanies);
+//document.getElementById("graphCompanies").addEventListener("click", graphCompanies);
 document.getElementById("companieSearchShow").addEventListener("click", getCompanies);
 document.getElementById("advertisementSearchShow").addEventListener("click", getAdvertisements);
 document.getElementById("removeMarker").addEventListener("click", removeMarker);
 document.getElementById("locateMe").addEventListener("click", locateMe);
+
+//document.querySelectorAll("td>a[ad_id]").addEventListener("click", graphCompanies);
 
 //Companies
 function getCompanies(event){
@@ -115,7 +117,7 @@ function getAdvertisements(event){
             "<strong>Pseudo : </strong>" + result.advertisements[i].pseudo + "<br>" +
             "<strong>Designation : </strong>" + result.advertisements[i].designation + "<br>" +
             "<strong>Titre : </strong>" + result.advertisements[i].titre + "<br>" +
-            "<strong>Distance : </strong>" + Math.round(result.advertisements[i].distance / 6e-06) + " m " +
+            "<strong>Distance : </strong>" + result.advertisements[i].distance + " m " +
             "<a href='http://map.project-osrm.org/?z=14&center="+ mylat + "," + mylon + "&loc="+ mylat +"," + mylon + "&loc=" + result.advertisements[i].lat + "," + result.advertisements[i].lon + "&hl=en&alt=0' target='_blank'>Y aller</a>");
         }
       } else {
@@ -358,7 +360,8 @@ function addAdvertisement2Result(advertisements, colWidth){
     tr.appendChild(tdPseudo);
 
     var tdTitre = document.createElement("td");
-    tdTitre.innerHTML = advertisements[i].titre;
+    //tdTitre.innerHTML = advertisements[i].titre;
+    tdTitre.innerHTML = "<a ad_id=" + advertisements[i].id + ">" + advertisements[i].titre + "</a>";
     tr.appendChild(tdTitre);
 
     var tdDesignation = document.createElement("td");
@@ -370,19 +373,23 @@ function addAdvertisement2Result(advertisements, colWidth){
     tr.appendChild(tdCout);
 
     var tdDistance = document.createElement("td");
-    tdDistance.innerHTML = advertisements[i].distance / 1000 + " km";
+    tdDistance.innerHTML = (advertisements[i].distance / 1000) + " km";
     tr.appendChild(tdDistance);
 
     tbody.appendChild(tr);
   }
+  var idLinks = document.querySelectorAll("td>a[ad_id]");
+  for(i = 0; i < idLinks.length; i++){
+    idLinks[i].addEventListener("click", graphCompanies);
+  }
 }
-
-var links = {};
-
+var test ;
 //GraphAd2Companies
 function graphCompanies(event){
   //waitingDialog.show("Recherche en cours... Veuillez patienter.");
 
+  console.log("event : " + event.target.attributes[0]);
+  test = event;
   // création de l'objet xhr
   var ajax = new XMLHttpRequest();
 
@@ -404,10 +411,18 @@ function graphCompanies(event){
     if (ajax.readyState == 4 && ajax.status == 200) {
       // le texte de la réponse
       //var links = JSON.parse(ajax.responseText);
-      //var links = {};
-      links = ajax.responseText;
+
+      var links = ajax.responseText;
+
+      console.log(links);
+
+      var links = [{"source": "ramon185", "target": "HOME SCHOOL TUTORING", "type": "licensing"},{"source": "ramon185", "target": "SURINACH*SURINACH VIVANTE/MARIE-JOSE/", "type": "licensing"},{"source": "ramon185", "target": "BOULET*LUCIANO/", "type": "licensing"},{"source": "ramon185", "target": "LEMAIRE*DOMINIQUE NOELLE/", "type": "licensing"},{"source": "ramon185", "target": "ALLARD*MELANIE/", "type": "licensing"},{"source": "ramon185", "target": "MONSEIGNY*MONSIGNY/BERNARD FRANCOIS/", "type": "licensing"},{"source": "ramon185", "target": "MARTIN*RODRIGUEZ/PILAR/", "type": "licensing"},{"source": "ramon185", "target": "SEVERIN*CLAUDETTE/", "type": "licensing"},{"source": "ramon185", "target": "GORAM*LY/LY MAGUY/", "type": "licensing"},{"source": "ramon185", "target": "MALET*JESSIE MARIE MICHELLA/", "type": "licensing"},{"source": "ramon185", "target": "PIERRE*SIMON/", "type": "licensing"},{"source": "ramon185", "target": "BL-EDUCATION SAS", "type": "licensing"},{"source": "ramon185", "target": "UNIS POUR REUSSIR", "type": "licensing"},{"source": "ramon185", "target": "MEKDAM*HABIB/", "type": "licensing"},{"source": "ramon185", "target": "ASSOCIATION DE PARENTS D'ELEVES ENGAGES AVEC LES ENFANTS", "type": "licensing"},{"source": "ramon185", "target": "ASSOCIATION DES PARENTS D'ELEVES DES INSTITUTIONS SCOLAIRES DE CHNE-OR", "type": "licensing"}];
+
+      console.log(links);
 
       var nodes = {};
+
+      console.log(links.length);
 
       // Compute the distinct nodes from the links.
       links.forEach(function(link) {
