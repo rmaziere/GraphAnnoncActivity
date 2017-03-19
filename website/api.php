@@ -3,12 +3,11 @@ header('Content-type: text/html; charset=utf-8');
 $beginning_time = microtime(true);
 include_once("connexion.inc.php");
 
-$limit = 100;
+$limit = 500;
 
 //Companies
 if (isset($_GET["type"]) && $_GET["type"] == "companies") {
-  $companies_list = "SELECT s.siren, s.nic, s.nomen_long, s.libapet, b.lat, b.lon, ST_Distance(ST_SetSRID(ST_Point(" . $_GET['lon'] . ", " . $_GET['lat'] . "), 4326), b.geom) AS distance, b.numero, b.nom_voie, b.code_post, b.nom_commune FROM test.siren93 s, test.ban b WHERE s.banid = b.id ";
-  //$companies_list = "SELECT s.siren, s.nic, s.nomen_long, s.libapet, b.geom, b.lat, b.lon, ST_Distance(ST_SetSRID(ST_Point(" . $_GET['lon'] . ", " . $_GET['lat'] . "), 4326), b.geom) AS distance, b.numero, b.nom_voie, b.code_post, b.nom_commune FROM public.siren s, test.ban b WHERE s.banid = b.id ";
+  $companies_list = "SELECT s.siren, s.nic, s.nomen_long, s.libapet, b.lat, b.lon, ST_Distance(ST_SetSRID(ST_Point(" . $_GET['lon'] . ", " . $_GET['lat'] . "), 4326), b.geom) AS distance, b.numero, b.nom_voie, b.code_post, b.nom_commune FROM public.siren s, public.ban b WHERE s.banid = b.id ";
   if (isset($_GET["insee"]) && strlen($_GET["insee"]) == 5) {
     $companies_list .= " AND s.code_insee = '" . $_GET['insee'] . "'";
   }
@@ -23,7 +22,7 @@ if (isset($_GET["type"]) && $_GET["type"] == "companies") {
   }
 
   //Add the ORDER BY
-  $companies_list .= " ORDER BY b.code_insee, b.nom_voie, b.numero";
+  $companies_list .= " ORDER BY distance";
 
   if (isset($_GET["quantity"]) && is_numeric($_GET["quantity"]) && $_GET["quantity"] <= $limit) {
     $companies_list .= " LIMIT " . $_GET['quantity'] . ";";
@@ -79,9 +78,6 @@ if (isset($_GET["type"]) && $_GET["type"] == "advertisements") {
  a.lat, a.lng AS lon, ST_Distance(ST_SetSRID(ST_Point(" . $_GET['lon'] . ", " . $_GET['lat'] . "), 4326), a.geom) AS distance, a.ville, a.disponibilite, a.designation, a.rayon
  FROM public.annonce a
  WHERE 1 = 1 ";
- /*if (isset($_GET["insee"]) && strlen($_GET["insee"]) == 5) {
-   $annonces_list .= " AND s.code_insee = '" . $_GET['insee'] . "'";
- }*/
  if (isset($_GET["lat"]) && is_numeric($_GET["lat"]) && isset($_GET["lon"]) && is_numeric($_GET["lon"]) && isset($_GET["distance"]) && is_numeric($_GET["distance"])) { //Lat/Long in WGS84
    $annonces_list .= " AND ST_DWithin(ST_SetSRID(ST_Point(" . $_GET['lon'] . ", " . $_GET['lat'] . "), 4326), a.geom, " . distanceConverter($_GET['distance'], "m2dgr") . ")";
  }
@@ -90,7 +86,7 @@ if (isset($_GET["type"]) && $_GET["type"] == "advertisements") {
  }
 
  //Add the ORDER BY
- //$annonces_list .= " ORDER BY b.code_insee, b.nom_voie, b.numero";
+ $annonces_list .= " ORDER BY distance";
 
  if (isset($_GET["quantity"]) && is_numeric($_GET["quantity"]) && $_GET["quantity"] <= $limit) {
    $annonces_list .= " LIMIT " . $_GET['quantity'] . ";";
@@ -143,7 +139,7 @@ if (isset($_GET["type"]) && $_GET["type"] == "ad2companies") {
                     FROM annonce a
                     LEFT JOIN activity_naf AS c ON c.activity_id = a.activity_id
                     LEFT JOIN siren AS s ON s.apet700 = c.naf_code
-                    WHERE ST_DWithin(a.geom, s.geom, 0.1)";
+                    WHERE ST_DWithin(a.geom, s.geom, (a.rayon * 1000 * 6.2e-06))";
 
  if (isset($_GET["ad_id"]) && !empty($_GET["ad_id"])) {
    $companies_list .= " AND a.id = " . $_GET['ad_id'];
@@ -181,9 +177,9 @@ if (isset($_GET["type"]) && $_GET["type"] == "ad2companies") {
         echo "</p>";
       }
       if (isset($_GET["format"]) && strtolower($_GET["format"]) == "json") {
-        $json_companies .= "{source: \"" . $data['pseudo'] . "\", ";
-        $json_companies .= "target: \"" . $data['nomen_long'] . "\", ";
-        $json_companies .= "type: \"licensing\"}";
+        $json_companies .= "{\"source\": \"" . $data['pseudo'] . "\", ";
+        $json_companies .= "\"target\": \"" . $data['nomen_long'] . "\", ";
+        $json_companies .= "\"type\": \"licensing\"}";
 
         if($i < $count - 1){
           $json_companies .= ",";
@@ -227,12 +223,6 @@ function distanceConverter($value, $type){
 }
 
 pg_free_result($result);
-
-//Company
-
-//Addresses
-
-//Address
 
 pg_close($dbconn);
 
