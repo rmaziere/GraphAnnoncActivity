@@ -23,27 +23,62 @@ sudo cp website/index.html /var/www/html
 ## Test du déploiement
 Allez sur [http://212.194.0.132:482/](http://212.194.0.132:482/)
 
-## Installation des différents paquets
+## Passage a psql
 ```
-sudo apt-get install php5 mysql-server phpmyadmin
-```
+sudo apt-get install php5-pgsql
 
-## Configuration de mysql-server-5.5
-```
-Nouveau mot de passe du superutilisateur de MySQL : Password
-
-Confirmation du mot de passe du superutilisateur de MySQL : Password
+sudo apt-get install postgresql
 ```
 
-## Configuration de phpmyadmin
+## Définition dumot de passe de postgres
 ```
-Serveur web à reconfigurer automatiquement : apache2
+sudo -u postgres psql postgres
 
-Faut-il configurer la base de données de phpmyadmin avec dbconfig-common ? : Oui
+\password postgres
 
-Mot de passe de l'administrateur de la base de données : Password
-
-Mettez le même mot de passe que celui de la configuration Mysql-server
-
-Mot de passe de connexion MySQL pour phpmyadmin : Password
+\q
 ```
+
+## Création de la db
+```
+sudo -u postgres createdb bigData
+```
+
+## Démmarge de postgres
+```
+sudo /etc/init.d/postgresql start
+```
+
+## Récupération des dump de la bdd
+```
+sudo -E curl -L http://78.218.16.117:8080/db/dump_bigdata_2017-03-19_ban-siren.sql >> dump_ban-siren.sql
+
+sudo -E curl -L http://78.218.16.117:8080/db/dump_bigdata_2017-03-19_ban-siren_data.sql >> dump_ban-siren_data.sql
+
+sudo -E curl -L http://78.218.16.117:8080/db/dump_bigdata_2017-03-19_ban-siren_struct.sql >> dump_ban-siren_struct.sql
+
+
+```
+
+## Installtion postgis
+```
+sudo apt-get install postgresql-9.4-postgis-2.1
+```
+
+## Création de l'extension postgis
+```
+sudo -u postgres bigData
+
+CREATE EXTENSION postgis;;
+```
+
+## Import des dump
+```
+sudo -u postgres psql bigData < dump_ban-siren_struct.sql
+
+sudo -u postgres psql bigData < dump_ban-siren_data.sql
+
+sudo -u postgres psql bigData < dump_ban-siren.sql
+```
+
+## Changement du serveur dans monscript.js et de connexion.inc.php
