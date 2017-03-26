@@ -173,6 +173,16 @@ if (isset($_GET["type"]) && $_GET["type"] == "companies" && isset($_GET["lat"]) 
 
 Comme nous le voyons ici, une série de vérification des différents paramètres permet cette construction de requête, puis une fois les données retournées, la construction du json.
 
+### Les différents flux de données
+
+#### Sens client -> serveur
+
+Les requêtes AJAX envoient au serveur seulement des données ASCII via l'URL de l'API.
+
+#### Sens client <- serveur
+
+Les résultats de l'API sont retournés dans un JSON, qu'il suffit au script js de "parsser".
+
 ## HeatMap
 
 La carte de chaleur permet l'affichage des concentrations de sociétés sur les départements du 93 ainsi que du 77.
@@ -185,5 +195,15 @@ Si nous souhaitions disposer d'une carte de chaleur sur l'ensemble du territoire
 
 Une solution pour avoir du dynamisme serait de réaliser différentes requêtes, une pour chaque niveau de zoom et de prendre en compte la zone d'affichage de la carte.
 
-## Graph de relations
+## Graphe de relations
+
+La mise en relation d'entreprise vis-à-vis d'une annonce est affichée sous d'un graphe avec un nœud central qui est l'annonce et des nœuds à l'extrèmité des arcs, qui sont les entreprises situées dans la zone d'action de l'annonce en question.
+La bibliothèque utilisée est basée sur [http://d3js.org](D3.js) et est [Mobile Patent Suits](http://bl.ocks.org/mbostock/1153292)
+
+Elle prend en paramètres des *sources* et des *targets* reliées entre elles par un lien de longueur fixe.
+
+Quelques unes des limitations de cette bibliothèque sont la non possibilité d'avoir des liens de longueurs variables, la non possibilité d'interroger des entités. Il faudrait donc adapter cette dernière à nos désidérats.
+
+Pour ce projet, les graphes ne sont pas stockés mais bien calculés à la volée et affichés.
+Pour ce faire, il faut rechercher des annonces, puis cliquer sur l'intitulé de celle choisie, le graphe s'affichera en-dessous.
 
