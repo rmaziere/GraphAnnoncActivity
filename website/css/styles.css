@@ -6,8 +6,10 @@ body {
 
 #map {
   height: 600px;
-  width: 80%;
+  width: 100%;
 }
+
+/*Graph*/
 
 .link {
   fill: none;
@@ -39,3 +41,8 @@ text {
   text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 }
 
+svg {
+  position: relative;
+}
+
+0

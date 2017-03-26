@@ -26,7 +26,7 @@
          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
            <span class="sr-only">Toggle navigation</span>
          </button>
-         <a class="navbar-brand" href="https://github.com/rmaziere/Proxyret" target="_blank">Proxyret</a>
+         <a class="navbar-brand" href="https://github.com/rmaziere/GraphAnnoncActivity" target="_blank">Proxyret</a>
        </div>
        <div id="navbar" class="navbar-collapse collapse">
 
@@ -36,8 +36,9 @@
              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Entreprises<span class="caret"></span></a>
              <ul class="dropdown-menu">
                <li><input type="text" name="activity" id="activity" placeholder="Activité recherchée" class="form-control"></li>
-               <li role="separator" class="divider"></li>
                <li><button type="submit" name="companieSearchShow" id="companieSearchShow" class="btn btn-success">Recherche et affichage</button></li>
+               <li role="separator" class="divider"></li>
+               <li><button type="submit" name="heatMapShow" id="heatMapShow" class="btn btn-success">Carte de chaleur</button></li>
              </ul>
            </li>
            <!--Annonces-->
@@ -54,10 +55,9 @@
          <!--div class="navbar-form navbar-right"-->
          <div class="navbar-form">
            <div class="form-group">
-             <input type="number" min="50" step="25" name="distance" id="distance" placeholder="Distance en mètre" class="form-control">
+             <input type="number" min="50" step="25" max="5000" name="distance" id="distance" placeholder="Distance en mètre" class="form-control">
            </div>
            <button type="submit" name="locateMe" id="locateMe" class="btn btn-warning">Me localiser</button>
-           <button type="submit" name="graphCompanies" id="graphCompanies" class="btn btn-warning">graphCompanies</button>
            <button type="submit" name="removeMarker" id="removeMarker" class="btn btn-danger">Supprimer les marqueurs</button>
          </div>
        </div><!--/.navbar-collapse -->
@@ -76,6 +76,7 @@
     <script src="./js/jquery.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>
     <script src="./js/leaflet.js"></script>
+    <script src="./js/Leaflet.heat.js"></script>
     <script src="./js/script.js"></script>
     <script src="./js/waitingPopup.js"></script>
   </body>
