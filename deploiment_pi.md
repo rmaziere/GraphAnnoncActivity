@@ -5,7 +5,7 @@
 sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade
 ```
 
-## Installation du serveur apapche
+## Installation du serveur apache
 ```
 sudo apt-get install apache2 -y
 ```
@@ -23,14 +23,14 @@ sudo cp website/index.html /var/www/html
 ## Test du déploiement
 Allez sur [http://212.194.0.132:482/](http://212.194.0.132:482/)
 
-## Passage a psql
+## Passage à psql
 ```
 sudo apt-get install php5-pgsql
 
 sudo apt-get install postgresql
 ```
 
-## Définition dumot de passe de postgres
+## Définition du mot de passe de postgres
 ```
 sudo -u postgres psql postgres
 
@@ -44,7 +44,7 @@ sudo -u postgres psql postgres
 sudo -u postgres createdb bigData
 ```
 
-## Démmarge de postgres
+## Lancement de postgres
 ```
 sudo /etc/init.d/postgresql start
 ```
@@ -60,7 +60,7 @@ sudo -E curl -L http://78.218.16.117:8080/db/dump_bigdata_2017-03-19_ban-siren_s
 
 ```
 
-## Installtion postgis
+## Installation de postgis
 ```
 sudo apt-get install postgresql-9.4-postgis-2.1
 ```
